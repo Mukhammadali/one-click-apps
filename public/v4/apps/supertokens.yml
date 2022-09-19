@@ -1,0 +1,38 @@
+captainVersion: 4
+services:
+    $$cap_appname:
+        image: supertokens/supertokens-postgresql:$$cap_st_version
+        restart: always
+        environment:
+            API_KEYS:
+            ACCESS_TOKEN_VALIDITY: $$cap_st_access_token_validity
+            REFRESH_TOKEN_VALIDITY: $$cap_st_refresh_token_validity
+            DISABLE_TELEMETRY: true
+            POSTGRESQL_CONNECTION_URI: postgres://$$cap_pg_user:$$cap_pg_pass@srv-captain--$$cap_appname-db:5432/$$cap_pg_db
+            POSTGRESQL_TABLE_NAMES_PREFIX: supertokens
+        caproverExtra:
+            containerHttpPort: 3567
+caproverOneClickApp:
+    variables:
+        - id: $$cap_st_version
+          label: SuperTokens Version
+          description: Choose the latest version of SuperTokens from https://hub.docker.com/r/supertokens/supertokens-postgresql/tags
+          defaultValue: 3.10
+        - id: $$cap_st_access_token_validity
+          label: Access Token Validity
+          description: Enter value in seconds. Default 3600 = 1 hour
+          defaultValue: 3600
+        - id: $$cap_st_refresh_token_validity
+          label: Refresh Token Validity
+          description: Enter value in seconds. Default 14400 = 100 days
+          defaultValue: 14400
+    instructions:
+        start: |-
+            SuperTokens is an open source authentication solution.
+            More details: https://github.com/supertokens/supertokens-core
+        end: |-
+            SuperTokens has been successfully deployed!
+    displayName: SuperTokens
+    isOfficial: false
+    description: An open source authentication solution (works best with create-react-app).
+    documentation: See https://github.com/supertokens/supertokens-core
