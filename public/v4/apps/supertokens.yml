@@ -8,8 +8,8 @@ services:
             ACCESS_TOKEN_VALIDITY: $$cap_st_access_token_validity
             REFRESH_TOKEN_VALIDITY: $$cap_st_refresh_token_validity
             DISABLE_TELEMETRY: true
-            POSTGRESQL_CONNECTION_URI: postgres://$$cap_pg_user:$$cap_pg_pass@srv-captain--$$cap_appname-db:5432/$$cap_pg_db
-            POSTGRESQL_TABLE_NAMES_PREFIX: supertokens
+            POSTGRESQL_CONNECTION_URI: $$cap_st_pg_connection_uri
+            POSTGRESQL_TABLE_NAMES_PREFIX: $$cap_st_pg_table_names_prefix
         caproverExtra:
             containerHttpPort: 3567
 caproverOneClickApp:
@@ -17,7 +17,7 @@ caproverOneClickApp:
         - id: $$cap_st_version
           label: SuperTokens Version
           description: Choose the latest version of SuperTokens from https://hub.docker.com/r/supertokens/supertokens-postgresql/tags
-          defaultValue: 3.10
+          defaultValue: 3.16
         - id: $$cap_st_access_token_validity
           label: Access Token Validity
           description: Enter value in seconds. Default 3600 = 1 hour
@@ -26,6 +26,14 @@ caproverOneClickApp:
           label: Refresh Token Validity
           description: Enter value in seconds. Default 14400 = 100 days
           defaultValue: 14400
+        - id: $$cap_st_pg_table_names_prefix
+          label: PostgreSQL Table Names Prefix
+          description: For example, two tables created by SuperTokens are called emailpassword_users and thirdparty_users. If you add a prefix to them (something like "my_prefix"), then the tables will be renamed to my_prefix_emailpassword_users and my_prefix_thirdparty_users.
+          defaultValue: supertokens
+        - id: $$cap_st_pg_connection_uri
+          label: PostgreSQL Connection URI
+          description: Format postgres://<username>:<password>@<host>:<port>/<database_name>
+          
     instructions:
         start: |-
             SuperTokens is an open source authentication solution.
