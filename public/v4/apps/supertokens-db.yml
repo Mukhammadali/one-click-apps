@@ -47,9 +47,6 @@ caproverOneClickApp:
           label: PostgreSQL Table Names Prefix
           description: For example, two tables created by SuperTokens are called emailpassword_users and thirdparty_users. If you add a prefix to them (something like "my_prefix"), then the tables will be renamed to my_prefix_emailpassword_users and my_prefix_thirdparty_users.
           defaultValue: supertokens
-        - id: $$cap_st_pg_connection_uri
-          label: PostgreSQL Connection URI
-          description: Format postgres://<username>:<password>@<host>:<port>/<database_name>
         - id: $$cap_postgres_version
           label: Postgres Version
           defaultValue: 13.7
