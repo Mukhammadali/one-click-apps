@@ -1,0 +1,80 @@
+captainVersion: 4
+services:
+    $$cap_appname-db:
+        image: postgres:$$cap_postgres_version
+        volumes:
+            - $$cap_appname-db-data:/var/lib/postgresql/data
+        restart: always
+        environment:
+            POSTGRES_USER: $$cap_pg_user
+            POSTGRES_PASSWORD: $$cap_pg_pass
+            POSTGRES_DB: $$cap_pg_db
+        caproverExtra:
+            notExposeAsWebApp: 'true'
+    $$cap_appname:
+        depends_on:
+            - $$cap_appname-db
+        image: supertokens/supertokens-postgresql:$$cap_st_version
+        restart: always
+        environment:
+            API_KEYS:
+            ACCESS_TOKEN_VALIDITY: $$cap_st_access_token_validity
+            REFRESH_TOKEN_VALIDITY: $$cap_st_refresh_token_validity
+            DISABLE_TELEMETRY: true
+            POSTGRESQL_TABLE_NAMES_PREFIX: $$cap_st_pg_table_names_prefix
+            POSTGRESQL_USER: $$cap_pg_user
+            POSTGRESQL_PASSWORD: $$cap_pg_pass
+            POSTGRESQL_HOST: srv-captain--$$cap_appname-db
+            POSTGRESQL_PORT: 5432
+            POSTGRESQL_DATABASE_NAME: $$cap_pg_db
+        caproverExtra:
+            containerHttpPort: 3567
+caproverOneClickApp:
+    variables:
+        - id: $$cap_st_version
+          label: SuperTokens Version
+          description: Choose the latest version of SuperTokens from https://hub.docker.com/r/supertokens/supertokens-postgresql/tags
+          defaultValue: 3.16
+        - id: $$cap_st_access_token_validity
+          label: Access Token Validity
+          description: Enter value in seconds. Default 3600 = 1 hour
+          defaultValue: 3600
+        - id: $$cap_st_refresh_token_validity
+          label: Refresh Token Validity
+          description: Enter value in seconds. Default 14400 = 100 days
+          defaultValue: 14400
+        - id: $$cap_st_pg_table_names_prefix
+          label: PostgreSQL Table Names Prefix
+          description: For example, two tables created by SuperTokens are called emailpassword_users and thirdparty_users. If you add a prefix to them (something like "my_prefix"), then the tables will be renamed to my_prefix_emailpassword_users and my_prefix_thirdparty_users.
+          defaultValue: supertokens
+        - id: $$cap_st_pg_connection_uri
+          label: PostgreSQL Connection URI
+          description: Format postgres://<username>:<password>@<host>:<port>/<database_name>
+        - id: $$cap_postgres_version
+          label: Postgres Version
+          defaultValue: 13.7
+          description: Choose the latest version of Postgres from https://hub.docker.com/_/postgres?tab=tags
+        - id: $$cap_pg_user
+          label: Postgres Username
+          description: ''
+          validRegex: /.{1,}/
+        - id: $$cap_pg_pass
+          label: Postgres Password
+          description: ''
+          validRegex: /.{1,}/
+        - id: $$cap_pg_db
+          label: Postgres Default Database
+          description: ''
+          validRegex: /.{1,}/
+
+          
+    instructions:
+        start: |-
+            SuperTokens is an open source authentication solution.
+            More details: https://github.com/supertokens/supertokens-core
+        end: |-
+            SuperTokens has been successfully deployed!
+    displayName: SuperTokens (with PostgreSQL)
+    isOfficial: false
+    description: An open source authentication solution (works best with create-react-app).
+    documentation: See https://github.com/supertokens/supertokens-core
