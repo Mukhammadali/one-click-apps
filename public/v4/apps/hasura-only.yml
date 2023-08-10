@@ -1,0 +1,49 @@
+captainVersion: 4
+services:
+    $$cap_appname:
+        image: hasura/graphql-engine:$$cap_hasura_version
+        restart: always
+        environment:
+            PG_DATABASE_URL: $$cap_database_url
+            HASURA_GRAPHQL_METADATA_DATABASE_URL: $$cap_database_url
+            HASURA_GRAPHQL_ENABLE_CONSOLE: "false" # set to "false" to disable console
+            HASURA_GRAPHQL_ADMIN_SECRET: $$cap_admin_secret
+            HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+            HASURA_GRAPHQL_METADATA_DEFAULTS: '{"backend_configs":{"dataconnector":{"athena":{"uri":"http://data-connector-agent:8081/api/v1/athena"},"mariadb":{"uri":"http://data-connector-agent:8081/api/v1/mariadb"},"mysql8":{"uri":"http://data-connector-agent:8081/api/v1/mysql"},"oracle":{"uri":"http://data-connector-agent:8081/api/v1/oracle"},"snowflake":{"uri":"http://data-connector-agent:8081/api/v1/snowflake"}}}}'
+        caproverExtra:
+            containerHttpPort: '8080'
+    $$cap_appname-data-connector-agent:
+        image: hasura/graphql-data-connector:v2.31.0
+        restart: always
+        environment:
+            QUARKUS_LOG_LEVEL: ERROR # FATAL, ERROR, WARN, INFO, DEBUG, TRACE
+            ## https://quarkus.io/guides/opentelemetry#configuration-reference
+            QUARKUS_OPENTELEMETRY_ENABLED: "false"
+            ## QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+        caproverExtra:
+            containerHttpPort: '8081'
+caproverOneClickApp:
+    variables:
+        - defaultValue: v2.31.0
+          description: Check out their GitHub page for their latest version https://github.com/hasura/graphql-engine
+          id: $$cap_hasura_version
+          label: Hasura Version
+          validRegex: /^([^\s^\/])+$/
+        - description: The admin secret gives you access to the console.
+          id: $$cap_admin_secret
+          label: Hasura admin secret(password)
+          validRegex: /^(?=.*\d).{10,}$/
+        - id: $$cap_database_url
+          label: Postgres Connection URL
+          description: postgres://username:password@host/database
+          validRegex: /postgres://.+/.+/
+    instructions:
+        end: >
+            Hasura is deployed and available as $$cap_appname. 
+
+            IMPORTANT: It will take up to 2 minutes for Hasura to be ready. Before that, you might see 502 error page.
+        start: Instant Realtime GraphQL on Postgres with web admin console.
+    displayName: Hasura - No Database
+    isOfficial: false
+    description: Instant realtime GraphQL APIs on any Postgres application, existing or new
+    documentation: Hasura GraphQL Engine

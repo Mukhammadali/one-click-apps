@@ -1,0 +1,112 @@
+captainVersion: 4
+services:
+  $$cap_appname-kong:
+    image: kong:$$cap_kong_version
+    volumes:
+        - $$cap_appname-kong-config:/var/lib/kong:ro
+    restart: unless-stopped
+    ports:
+        - $$cap_kong_https_port:8443
+    environment:
+        KONG_DATABASE: $$cap_kong_database
+        KONG_DECLARATIVE_CONFIG: $$cap_kong_declaritive_config
+        # https://github.com/supabase/cli/issues/14
+        KONG_DNS_ORDER: $$cap_kong_dns_order
+        KONG_PLUGINS: $$cap_kong_plugins
+        KONG_ADMIN_LISTEN: 0.0.0.0:$$cap_kong_admin_port, 0.0.0.0:$$cap_kong_admin_ssl_port ssl
+        KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+        KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+    caproverExtra:
+        containerHttpPort: 8000
+        dockerfileLines:
+          RUN cp ~/supabase/docker/volumes/api/kong.yml /var/lib/docker/volumes/captain--$$cap_appname-kong-config/_data/kong.yml
+
+caproverOneClickApp:
+  variables:
+      # shared env
+      - id: $$cap_jwt_secret
+        label: JWT secret
+        defaultValue: $$cap_gen_random_hex(32)
+        validRegex: /^([^\s^\/])+$/
+
+      # postgres variables
+      - id: $$cap_db_version
+        label: Postgres Version
+        defaultValue: '14.1.0.106'
+        description: Check out their Docker page for the valid tags https://hub.docker.com/r/supabase/postgres/tags
+        validRegex: /^([^\s^\/])+$/
+      - id: $$cap_pg_user
+        label: Postgres Username
+        defaultValue: 'postgres'
+        validRegex: /.{1,}/
+      - id: $$cap_pg_pass
+        label: Postgres Password
+        defaultValue: $$cap_gen_random_hex(64)
+        validRegex: /.{1,}/
+      - id: $$cap_pg_db
+        label: Postgres Default Database
+        defaultValue: 'postgres'
+        validRegex: /.{1,}/
+      # kong variables
+      - id: $$cap_kong_version
+        label: Kong version
+        defaultValue: '2.8.1'
+        description: Check out their Docker page for the valid tags https://hub.docker.com/_/kong?tab=tags
+        validRegex: /^([^\s^\/])+$/
+      - id: $$cap_kong_http_port
+        label: Kong HTTP port
+        defaultValue: '8000'
+        validRegex: /^\d+$/
+      - id: $$cap_kong_https_port
+        label: Kong HTTPS port
+        defaultValue: '8443'
+        validRegex: /^\d+$/
+      - id: $$cap_kong_admin_port
+        label: Kong Admin Listen port
+        defaultValue: '8001'
+        validRegex: /^\d+$/
+      - id: $$cap_kong_admin_ssl_port
+        label: Kong Admin Listen SSL port
+        defaultValue: '8444'
+        validRegex: /^\d+$/
+      - id: $$cap_kong_database
+        label: Kong Database
+        defaultValue: 'off'
+        validRegex: /^([^\s^\/])+$/
+      - id: $$cap_kong_declaritive_config
+        label: Kong Declarative Config
+        defaultValue: '/var/lib/kong/kong.yml'
+      - id: $$cap_kong_dns_order
+        label: Kong DNS order
+        defaultValue: 'LAST,A,CNAME'
+        validRegex: /^([^\s^\/])+$/
+      - id: $$cap_kong_plugins
+        label: Kong Plugins
+        defaultValue: 'request-transformer,cors,key-auth,acl'
+        validRegex: /^([^\s^\/])+$/
+  instructions:
+      start: >-
+          Supabase is an open source Firebase alternative.
+      end: >
+          Supabase is deployed.
+          1. Make sure to enable websocket support inside $$cap_appname-realtime.
+          2. You will also have to create a kong.yml inside /var/lib/docker/volumes/captain--$$cap_appname-kong-config/_data
+              Check https://github.com/supabase/supabase/blob/master/docker/volumes/api/kong.yml for the example content
+              (make sure to edit and add your ANON_KEY, SERVICE_KEY and service url)
+          3. # Set $$cap_appname-db instance count to 0
+            `docker service scale srv-captain--$$cap_appname-db=0`
+          4. Run the following command
+            # delete already created database
+            `rm -rf /var/lib/docker/volumes/captain--$$cap_appname-db-data/_data/*`
+            # clone supabase repo to extract migrations
+            `git clone https://github.com/supabase/supabase`
+            # copy migrations required for supabase
+            `cp supabase/docker/volumes/db/init/* /var/lib/docker/volumes/captain--$$cap_appname-db-init/_data/ && rm -rf supabase`
+            # now set instance count for $$cap_appname-db back to 1
+            `docker service scale srv-captain--$$cap_appname-db=1`
+            # once database is started, set wal_level to logical and restart database again
+            `echo "wal_level = 'logical'" >> /var/lib/docker/volumes/captain--$$cap_appname-db-data/_data/postgresql.conf`
+  displayName: Supabase
+  isOfficial: true
+  description: Supabase is an open source Firebase alternative.
+  documentation: Taken from https://github.com/supabase/supabase
