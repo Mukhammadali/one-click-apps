@@ -21,7 +21,7 @@ caproverOneClickApp:
     variables:
         - id: $$cap_fusionauth_version
           label: FusionAuth Version
-          defaultValue: 1.42.0
+          defaultValue: 1.47.1
           description: 'See tags at: https://hub.docker.com/r/fusionauth/fusionauth-app/tags'
           validRegex: /^([^\s^\/])+$/
         - id: $$cap_fusion_memory
@@ -34,15 +34,6 @@ caproverOneClickApp:
           defaultValue: '9011'
           description: Internal port for Fusion Auth container to listens to.
           validRegex: /^([0-9])+$/
-        - id: $$cap_container_search_port
-          label: Container TCP Port
-          defaultValue: '9200'
-          description: Internal port for Elasticsearch the container listens to.
-          validRegex: /^([0-9])+$/
-        - id: $$cap_postgres_version
-          label: Postgres Version
-          defaultValue: 13.7
-          description: Choose the latest version of Postgres from https://hub.docker.com/_/postgres?tab=tags
         - id: $$cap_pg_user
           label: Postgres Username
           description: ''
@@ -51,11 +42,11 @@ caproverOneClickApp:
           label: Postgres Password
           description: ''
           validRegex: /.{1,}/
-        - id: $$cap_pg_db
-          label: Postgres Default Database
+        - id: $$cap_pg_host
+          label: Postgres Database HOST
           defaultValue: 'fusionauth'
-          description: ''
-          validRegex: /.{1,}/
+          description: 'Ex: postgres://username:password@host/database'
+          validRegex: /postgres://.+/.+/
     instructions:
         start: >-
             FusionAuth is a modern platform for Customer Identity and Access Management (CIAM). FusionAuth provides APIs and a responsive web user interface to support login, registration, localized email, multi-factor authentication, reporting and much more. See: https://fusionauth.io/docs/v1/tech/getting-started/ and https://github.com/FusionAuth/fusionauth-containers
