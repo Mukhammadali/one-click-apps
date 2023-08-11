@@ -1,53 +1,17 @@
 captainVersion: 4
 services:
-    # $$cap_appname-db:
-    #     image: postgres:$$cap_postgres_version
-    #     volumes:
-    #         - $$cap_appname-db-data:/var/lib/postgresql/data
-    #     restart: always
-    #     environment:
-    #         POSTGRES_USER: $$cap_pg_user
-    #         POSTGRES_PASSWORD: $$cap_pg_pass
-    #         POSTGRES_DB: $$cap_pg_db
-        # caproverExtra:
-        #     notExposeAsWebApp: 'true'
-    # $$cap_appname-elasticsearch:
-    #     image: elasticsearch:$$cap_elasticsearch_version
-    #     volumes:
-    #         - $$cap_appname-elasticsearch-data:/usr/share/elasticsearch/data
-    #     restart: always
-    #     environment:
-    #         cluster.name: fusionauth
-    #         ES_JAVA_OPTS: -Xms512m -Xmx512m
-    #         bootstrap.memory_lock: "true"
-    #         http.port: $$cap_container_search_port
-    #         discovery.type: single-node
-    #     caproverExtra:
-    #         containerHttpPort: $$cap_container_search_port
-    #     healthcheck:
-    #       test: [ "CMD", "curl",  "--fail" ,"--write-out", "'HTTP %{http_code}'", "--silent", "--output", "/dev/null", "http://localhost:9200/" ]
-    #       interval: 5s
-    #       timeout: 5s
-    #       retries: 5
-    #     ulimits:
-    #       memlock:
-    #         soft: -1
-    #         hard: -1
     $$cap_appname-fusionauth:
         image: fusionauth/fusionauth-app:$$cap_fusionauth_version
-        # depends_on:
-        #     - $$cap_appname-elasticsearch
-        #     - $$cap_appname-db
         environment:
-            DATABASE_URL: jdbc:postgresql://srv-captain--$$cap_appname-db:5432/fusionauth
-            DATABASE_ROOT_USER: $$cap_pg_user
+            DATABASE_URL: jdbc:$$cap_pg_host
+            DATABASE_ROOT_USERNAME: $$cap_pg_user
             DATABASE_ROOT_PASSWORD: $$cap_pg_pass
-            DATABASE_USER: $$cap_pg_user
+            DATABASE_USERNAME: $$cap_pg_user
             DATABASE_PASSWORD: $$cap_pg_pass
             FUSIONAUTH_APP_MEMORY: $$cap_fusion_memory
-            SEARCH_SERVERS: http://srv-captain--$$cap_appname-elasticsearch:$$cap_container_search_port
-            FUSIONAUTH_APP_URL: http://srv-captain--$$cap_appname-fusionauth:$$cap_container_port
-            SEARCH_TYPE: elasticsearch
+            # SEARCH_SERVERS: http://srv-captain--$$cap_appname-elasticsearch:$$cap_container_search_port
+            # FUSIONAUTH_APP_URL: http://srv-captain--$$cap_appname-fusionauth:$$cap_container_port
+            SEARCH_TYPE: database
         restart: unless-stopped
         volumes:
             - $$cap_appname-fusionauth-config:/usr/local/fusionauth/config
@@ -75,11 +39,6 @@ caproverOneClickApp:
           defaultValue: '9200'
           description: Internal port for Elasticsearch the container listens to.
           validRegex: /^([0-9])+$/
-        - id: $$cap_elasticsearch_version
-          label: 'Elasticsearch Version Tag '
-          description: 'Check out the releases overview: https://www.elastic.co/de/downloads/elasticsearch'
-          defaultValue: 7.17.8
-          validRegex: /^([^\s^\/])+$/
         - id: $$cap_postgres_version
           label: Postgres Version
           defaultValue: 13.7
