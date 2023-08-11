@@ -1,7 +1,6 @@
 captainVersion: 4
 services:
     $$cap_appname:
-        image: nhost/hasura-storage:$$cap_version
         restart: always
         environment:
             DEBUG: "true"
@@ -18,6 +17,7 @@ services:
         caproverExtra:
             containerHttpPort: '8000'
             dockerfileLines:
+                - FROM nhost/hasura-storage:$$cap_version
                 - CMD ["serve"]
 caproverOneClickApp:
     variables:
