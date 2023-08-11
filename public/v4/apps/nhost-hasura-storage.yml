@@ -17,6 +17,8 @@ services:
             POSTGRES_MIGRATIONS_SOURCE: $$cap_database_url
         caproverExtra:
             containerHttpPort: '8000'
+            dockerfileLines:
+                - CMD ["serve"]
 caproverOneClickApp:
     variables:
         - defaultValue: 0.3.6
