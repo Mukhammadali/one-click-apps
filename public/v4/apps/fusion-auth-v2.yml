@@ -44,9 +44,9 @@ caproverOneClickApp:
           validRegex: /.{1,}/
         - id: $$cap_pg_host
           label: Postgres Database HOST
-          defaultValue: 'fusionauth'
+          defaultValue: ''
           description: 'Ex: postgres://username:password@host/database'
-          validRegex: /postgres://.+/.+/
+          validRegex: /postgres://.+/.+/y
     instructions:
         start: >-
             FusionAuth is a modern platform for Customer Identity and Access Management (CIAM). FusionAuth provides APIs and a responsive web user interface to support login, registration, localized email, multi-factor authentication, reporting and much more. See: https://fusionauth.io/docs/v1/tech/getting-started/ and https://github.com/FusionAuth/fusionauth-containers
